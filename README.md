@@ -12,3 +12,7 @@ usage: migtool deploy <propertyfile> [<directoryname>] [checkonly|d] ["testclass
 usage: migtool compare <sourcepropertyfile> <targetpropertyfile> [<packagefile.xml>]
 
 More of a manual to follow
+
+Required dependecies (not in this repo): 
+Saxon XSLT parser jar
+ant-salesforce.jar (from Force.com migration tool installation package).
