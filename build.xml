@@ -1,0 +1,122 @@
+<project name="Sample usage of Salesforce Ant tasks" basedir="." xmlns:sf="antlib:com.salesforce">
+
+	<!-- <property file="build.properties"/> -->
+	<property environment="env"/>
+
+	<!-- Setting default value for username, password and session id properties to empty string 
+	     so unset values are treated as empty. Without this, ant expressions such as ${sf.username}
+	     will be treated literally.
+	-->
+	<condition property="sf.username" value=""> <not> <isset property="sf.username"/> </not> </condition>
+	<condition property="sf.password" value=""> <not> <isset property="sf.password"/> </not> </condition>
+	<condition property="sf.sessionId" value=""> <not> <isset property="sf.sessionId"/> </not> </condition>
+
+	<taskdef resource="com/salesforce/antlib.xml" uri="antlib:com.salesforce">
+	    <classpath>
+	        <pathelement location="./ant-salesforce.jar" />        	
+	    </classpath>
+	</taskdef>
+
+	<!-- Retrieve the information of all items of a particular metadata type -->
+	<target name="listMetadata">
+		<!-- <mkdir dir="${resultFilePath}"/> -->
+		<sf:listMetadata 
+			username="${username}" 
+			password="${password}" 
+			serverurl="${serverurl}" 
+			metadataType="${metadataType}"
+			folder="${folderName}"
+			resultFilePath="${resultFilePath}"/>
+	</target>
+
+	<!-- Retrieve the information on all supported metadata type -->
+	<target name="describeMetadata">
+		<sf:describeMetadata 
+			username="${username}" 
+			password="${password}" 
+			serverurl="${serverurl}" 
+			resultFilePath="${resultFilePath}"/>
+	</target>
+
+	<!-- Retrieve all the items of a particular metadata type -->
+	<target name="bulkRetrieve">
+		<mkdir dir="${dirname}"/>
+		<sf:bulkRetrieve 
+		username="${username}" 
+		password="${password}" 
+		serverurl="${serverurl}"  
+		maxPoll="${maxPoll}" 
+		metadataType="${metadataType}" 
+		retrieveTarget="${dirname}" 
+		batchSize="5000" 
+		unzip="false"/>
+	</target>
+
+	<!-- Retrieve all the items of a particular metadata type -->
+	<target name="bulkRetrieveFolder">
+		<mkdir dir="${dirname}"/>
+		<sf:bulkRetrieve 
+		username="${username}" 
+		password="${password}" 
+		serverurl="${serverurl}"  
+		maxPoll="${maxPoll}" 
+		metadataType="${metadataType}" 
+		retrieveTarget="${dirname}" 
+		batchSize="5000" 
+		unzip="false" 
+		containingFolder="${folderName}"/>
+	</target>
+	<target name="retrieveUnpackaged">
+		<mkdir dir="${dirname}"/>
+		<!-- Retrieve the contents into another directory -->
+		<sf:retrieve 
+		username="${username}" 
+		password="${password}" 
+		serverurl="${serverurl}"  
+		maxPoll="${maxPoll}"
+		pollWaitMillis="${pollWaitMillis}" 
+		retrieveTarget="${dirname}"
+		unpackaged="${packagefile}" 
+		unzip="false" />
+	</target>
+
+	<target name="deployZipWithTest">
+		<sf:deploy 
+		username="${username}" 
+		password="${password}" 
+		serverurl="${serverurl}"  
+		maxPoll="${maxPoll}"
+		pollWaitMillis="${pollWaitMillis}"
+		zipFile="${filename}"
+		checkOnly="${checkOnly}"
+		testLevel="RunSpecifiedTests" 
+		>
+			<runTest>SObjectSerializeUtilTest</runTest>
+		</sf:deploy>
+	</target>
+
+	<target name="deployZip">
+		<sf:deploy 
+		username="${username}" 
+		password="${password}" 
+		serverurl="${serverurl}"  
+		maxPoll="${maxPoll}"
+		pollWaitMillis="${pollWaitMillis}"
+		zipFile="${filename}"
+		checkOnly="${checkOnly}" 
+		/>
+	</target>
+
+	<target name="deployDir">
+		<sf:deploy 
+		username="${username}" 
+		password="${password}" 
+		serverurl="${serverurl}"  
+		maxPoll="${maxPoll}"
+		pollWaitMillis="${pollWaitMillis}" 
+		deployRoot="${deployRoot}"
+		checkOnly="${checkOnly}"  
+	/>
+	</target>
+
+</project>
