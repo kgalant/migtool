@@ -7,8 +7,8 @@ This is a Windows batch wrapper for the force.com migration tool that abstracts 
 Usage is as follows:
 
 
-	migtool retrieve &lt;propertyfile&gt; [&lt;packagefile.xml&gt;] [&lt;outputfilename&gt;]
-	migtool deploy &lt;propertyfile&gt; [&lt;directoryname&gt;|&lt;packagename.zip&gt;] [checkonly|d] ["testclass1,testclass2"]
+	migtool retrieve propertyfile [packagefile.xml] [outputfilename]
+	migtool deploy propertyfile [directoryname|packagename.zip] [checkonly|d] ["testclass1,testclass2"]
 
 So fairly straightforward:
 
