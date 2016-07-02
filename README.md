@@ -19,6 +19,7 @@ Required dependecies (not in this repo):
 
 Required installation/path setup:
 * Put some SFDC properties files in a directory. Properties files look like this:
+
 		username=user@password.com
 		password=T0ps3cr3t
 		serverurl=https://login.salesforce.com
