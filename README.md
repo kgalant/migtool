@@ -1,5 +1,5 @@
-# migtool
-migtool Force.com migration tool wrapper
+# migtool #
+## migtool Force.com migration tool wrapper ##
 
 Very simple readme here... An actual brief manual, etc. will follow
 
@@ -7,9 +7,9 @@ This is a Windows batch wrapper for the force.com migration tool that abstracts 
 Usage is as follows:
 
 
-* migtool retrieve <propertyfile> [<packagefile.xml>] [<outputfilename>]
-* migtool deploy <propertyfile> [<directoryname>] [checkonly|d] ["testclass1,testclass2"]
-* migtool compare <sourcepropertyfile> <targetpropertyfile> [<packagefile.xml>]
+* migtool retrieve &lt;propertyfile&gt; [&lt;packagefile.xml&gt;] [&lt;outputfilename&gt;]
+* migtool deploy &lt;propertyfile&gt; [&lt;directoryname&gt;] [checkonly|d] ["testclass1,testclass2"]
+* migtool compare &lt;sourcepropertyfile&gt; &lt;targetpropertyfile&gt; [&lt;packagefile.xml&gt;]
 
 More of a manual to follow
 
@@ -19,14 +19,14 @@ Required dependecies (not in this repo):
 
 Required installation/path setup:
 * Put some SFDC properties files in a directory. Properties files look like this:
-	username=user@password.com
-	password=T0ps3cr3t
-	serverurl=https://login.salesforce.com
-	maxPoll=20000
-	pollWaitMillis=10000
-	apiversion=37.0
+		username=user@password.com
+		password=T0ps3cr3t
+		serverurl=https://login.salesforce.com
+		maxPoll=20000
+		pollWaitMillis=10000
+		apiversion=37.0
 
-	The file name is *orgname*.properties, where *orgname* is what you will plug in to the commandline above as *<propertyfile>*
+	The file name is *orgname*.properties, where *orgname* is what you will plug in to the commandline above as *&lt;propertyfile&gt;*
 * Tell migtool where that directory is: change line 3 of migtool.bat to point to the properties dir
 * Make sure your ant and the migtool directory are both in the path
 * Tell migtool where the Saxon jar file is (line 4 of migtool.bat)
