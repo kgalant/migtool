@@ -1,7 +1,7 @@
 echo off
 
 SET PROPDIR=c:\dev\properties\
-SET SAXON=c:\tools\saxon9he.jar
+SET SAXON=c:\dev\tools\saxon9he.jar
 SET DEFPACKAGEFILE=package.zip
 SET METADATAIOBASE=c:\Dev\MetadataIO-M31
 
