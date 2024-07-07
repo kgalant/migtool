@@ -21,9 +21,9 @@
 	<target name="listMetadata">
 		<!-- <mkdir dir="${resultFilePath}"/> -->
 		<sf:listMetadata 
-			username="${username}" 
-			password="${password}" 
-			serverurl="${serverurl}" 
+			username="${sf.username}" 
+			password="${sf.password}" 
+			serverurl="${sf.serverurl}" 
 			metadataType="${metadataType}"
 			folder="${folderName}"
 			resultFilePath="${resultFilePath}"/>
@@ -32,9 +32,9 @@
 	<!-- Retrieve the information on all supported metadata type -->
 	<target name="describeMetadata">
 		<sf:describeMetadata 
-			username="${username}" 
-			password="${password}" 
-			serverurl="${serverurl}" 
+			username="${sf.username}" 
+			password="${sf.password}" 
+			serverurl="${sf.serverurl}" 
 			resultFilePath="${resultFilePath}"/>
 	</target>
 
@@ -42,10 +42,10 @@
 	<target name="bulkRetrieve">
 		<mkdir dir="${dirname}"/>
 		<sf:bulkRetrieve 
-		username="${username}" 
-		password="${password}" 
-		serverurl="${serverurl}"  
-		maxPoll="${maxPoll}" 
+		username="${sf.username}" 
+		password="${sf.password}" 
+		serverurl="${sf.serverurl}"  
+		maxPoll="${sf.maxPoll}" 
 		metadataType="${metadataType}" 
 		retrieveTarget="${dirname}" 
 		batchSize="5000" 
@@ -56,10 +56,10 @@
 	<target name="bulkRetrieveFolder">
 		<mkdir dir="${dirname}"/>
 		<sf:bulkRetrieve 
-		username="${username}" 
-		password="${password}" 
-		serverurl="${serverurl}"  
-		maxPoll="${maxPoll}" 
+		username="${sf.username}" 
+		password="${sf.password}" 
+		serverurl="${sf.serverurl}"  
+		maxPoll="${sf.maxPoll}" 
 		metadataType="${metadataType}" 
 		retrieveTarget="${dirname}" 
 		batchSize="5000" 
@@ -70,11 +70,11 @@
 		<mkdir dir="${dirname}"/>
 		<!-- Retrieve the contents into another directory -->
 		<sf:retrieve 
-		username="${username}" 
-		password="${password}" 
-		serverurl="${serverurl}"  
-		maxPoll="${maxPoll}"
-		pollWaitMillis="${pollWaitMillis}" 
+		username="${sf.username}" 
+		password="${sf.password}" 
+		serverurl="${sf.serverurl}"  
+		maxPoll="${sf.maxPoll}"
+		pollWaitMillis="${sf.pollWaitMillis}" 
 		retrieveTarget="${dirname}"
 		unpackaged="${packagefile}" 
 		unzip="false" />
@@ -82,11 +82,11 @@
 
 	<target name="deployZipWithTest">
 		<sf:deploy 
-		username="${username}" 
-		password="${password}" 
-		serverurl="${serverurl}"  
-		maxPoll="${maxPoll}"
-		pollWaitMillis="${pollWaitMillis}"
+		username="${sf.username}" 
+		password="${sf.password}" 
+		serverurl="${sf.serverurl}"  
+		maxPoll="${sf.maxPoll}"
+		pollWaitMillis="${sf.pollWaitMillis}"
 		zipFile="${filename}"
 		checkOnly="${checkOnly}"
 		testLevel="RunSpecifiedTests" 
@@ -97,11 +97,11 @@
 
 	<target name="deployZip">
 		<sf:deploy 
-		username="${username}" 
-		password="${password}" 
-		serverurl="${serverurl}"  
-		maxPoll="${maxPoll}"
-		pollWaitMillis="${pollWaitMillis}"
+		username="${sf.username}" 
+		password="${sf.password}" 
+		serverurl="${sf.serverurl}"  
+		maxPoll="${sf.maxPoll}"
+		pollWaitMillis="${sf.pollWaitMillis}"
 		zipFile="${filename}"
 		checkOnly="${checkOnly}" 
 		/>
@@ -109,11 +109,11 @@
 
 	<target name="deployDir">
 		<sf:deploy 
-		username="${username}" 
-		password="${password}" 
-		serverurl="${serverurl}"  
-		maxPoll="${maxPoll}"
-		pollWaitMillis="${pollWaitMillis}" 
+		username="${sf.username}" 
+		password="${sf.password}" 
+		serverurl="${sf.serverurl}"  
+		maxPoll="${sf.maxPoll}"
+		pollWaitMillis="${sf.pollWaitMillis}" 
 		deployRoot="${deployRoot}"
 		checkOnly="${checkOnly}"  
 	/>
