@@ -3,6 +3,7 @@
 SET PROPDIR=c:\dev\properties\
 SET SAXON=c:\dev\tools\saxon9he.jar
 SET DEFPACKAGEFILE=package.zip
+SET UNZIP=c:\dev\tools\7zip\7za.exe
 
 set P=%~dp0
 
@@ -20,7 +21,7 @@ if /I NOT %ACT%==deploy if /I NOT %ACT%==retrieve if /I NOT %ACT%==transfer goto
 SETLOCAL ENABLEEXTENSIONS 
 SETLOCAL EnableDelayedExpansion
 
-if /I %ACT%==cmp goto :transfer %1 %2 %3 %4 %5 %6
+if /I %ACT%==transfer goto :transfer %1 %2 %3 %4 %5 %6
 
 rem *********************************
 rem Common for both deploy & retrieve
@@ -35,7 +36,7 @@ IF EXIST %2 (
 	) else (
 		echo Couldn't find property file %2 or locate a %PROPDIR%%2.properties file, aborting...
 		exit /b 1
-		rem goto done
+
 	)
 )
 
@@ -56,16 +57,15 @@ if NOT "%PROPFILE%" == "" (
 		)
 		if NOT "!FETCHFILE!" == "" (
 			echo Retrieving !FETCHFILE! using !PROPFILE! into !OUTPUTFILE!
-		 	ant -f %P%build.xml -propertyfile !PROPFILE! -Dpackagefile=!FETCHFILE! -Ddirname=%CD% retrieveUnpackaged
+		 	cmd /c "ant -f %P%build.xml -propertyfile !PROPFILE! -Dpackagefile=!FETCHFILE! -Ddirname=%CD% retrieveUnpackaged"
 		 	for /F %%i IN (' dir /b retrieve* ') DO @(
 		 	
 		 		@if NOT "%4" == "" (
-		 			@move /y %%i %4
+		 			@move /y %%i %4 > NUL
 		 		) else (
-		 			@move /y %%i package.zip
+		 			@move /y %%i package.zip > NUL
 		 		)
 		 	)
-		 	rem goto done
 			exit /b
 	 	)
 	) 
@@ -105,16 +105,41 @@ if NOT "%PROPFILE%" == "" (
 			if NOT "!FETCHFILE!" == "" (
 				SET BUILDXML=build.xml
 				echo Asked to deploy !FETCHFILE! using %PROPFILE% !CHECKONLYSTRING!
+
 				if NOT [%5] == [] (
-					echo Asked to run tests selectively: %5
+					if "%5" == "findtests" (
+
+						echo Asked to find tests in !FETCHFILE!
+						echo:
+						rem Get Package.xml first
+						if "%BLDTARGET%" == "deployDir" (
+							rem If deploying a directory, it's simple
+							SET PACKAGEXML = !FETCHFILE!\package.xml
+						) else (
+							rem if deploying a zip, need to unzip, get the package.xml processed, then delete it again
+							mkdir .\migtooltemp
+							cmd /c "%UNZIP% e !FETCHFILE! package.xml -o.\migtooltemp > NUL"
+						)
+
+						FOR /F "tokens=* USEBACKQ" %%F IN (`"java -jar %SAXON% -s:.\migtooltemp\package.xml -xsl:%P%findtests.xsl -warnings:silent"`) DO (
+							SET TESTNAMES=%%F
+						)
+						rd /s /q .\migtooltemp
+					) else (
+						SET TESTNAMES=%5
+					)
+
+					echo Asked to run tests selectively: !TESTNAMES!
+					echo:
 					echo Customizing build.xml
 					SET BUILDXML=build-output.xml
-					java -jar %SAXON% -s:%P%build.xml -xsl:%P%addtests.xsl -o:%P%!BUILDXML! testclasses=%5 bldtarget=!BLDTARGET!
+					java -jar %SAXON% -s:%P%build.xml -xsl:%P%addtests.xsl -o:%P%!BUILDXML! testclasses=!TESTNAMES! bldtarget=!BLDTARGET!
+					echo:
 				)
+
 				echo calling: ant -f %P%!BUILDXML! -propertyfile %PROPFILE% !DEPLOYTARGET! !BLDTARGET! !CHECKONLYSTRING!
 			 	cmd /c "ant -f %P%!BUILDXML! -propertyfile %PROPFILE% !DEPLOYTARGET! !BLDTARGET! !CHECKONLYSTRING!"
 			 	exit /b
-				rem goto done
 			)
 		)
 	) 
@@ -142,7 +167,6 @@ IF EXIST %2 (
 		SET FROMFILE=%PROPDIR%%2.properties
 	) else (
 		echo Couldn't find property file %2 or locate a %PROPDIR%%2.properties file, aborting...
-		rem goto done
 		exit /b 1
 	)
 )
@@ -158,7 +182,6 @@ IF EXIST %3 (
 		SET TOFILE=%PROPDIR%%3.properties
 	) else (
 		echo Couldn't find property file %3 or locate a %PROPDIR%%3.properties file, aborting...
-		rem goto done
 		exit /b 1
 	)
 )
@@ -177,14 +200,14 @@ IF %ERRORLEVEL% EQU 0 (
 )
 
 exit /b
-rem goto done
 
 :usage
 echo "usage: migtool retrieve <propertyfile> [<packagefile.xml>] [<outputfilename>]"
-echo "usage: migtool deploy <propertyfile>/<directoryname> [checkonly|d] ["testclass1,testclass2"]" 
-echo "usage: migtool transfer <sourcepropertyfile> <targetpropertyfile> [<packagefile.xml>] [checkonly|d] ["testclass1,testclass2"]"
+echo "usage: migtool deploy <propertyfile>/<directoryname> [checkonly|d] ["testclass1,testclass2"|findtests]" 
+echo "usage: migtool transfer <sourcepropertyfile> <targetpropertyfile> [<packagefile.xml>] [checkonly|d] ["testclass1,testclass2"|findtests]"
 echo "parameters can only be omitted from the end - all parameters up to the last one you want to provide must be provided." 
 echo "E.g. testclass parameter ["testclass1,testclass2"] can be skipped, but if you want to use it, you must provide a [checkonly|d] value"
+echo "findtests parameter provided last (instead of comma-separated test class names) will get migtool to look through the package being deployed and add any class name ending with _Test (case-sensitive) to list of tests to run"
 :done
 
 exit

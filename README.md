@@ -29,7 +29,8 @@ For the org in the property file:
 
 * will try to deploy the directory or zip provided. If nothing is provided, will try the default package name (set in line 5 of migtool.bat)
 * if checkonly is given after the whatever to deploy, it will validate only - any other parameter here (or lack of anything after the item to deploy) will mean do a real deployment
-* any testclasses provided (if more than one then in double quotes, comma-separated, no extra spaces) as the last parameter mean run these test classes only (only for fairly recent API versions >=34)
+* any testclasses provided (if more than one then in double quotes, comma-separated, no extra spaces) as the last parameter mean run these test classes only (only for API versions >=34)
+* if the string 'findtests' is provided instead of testclass names, migtool will look through the package being deployed, take any classes that end with _Test and assume they're test classes and add them to be run with the deployment
 
 Remember, this is basically DOS, so if you want to provide e.g. specific test classes to run, you have to provide it with the previous parameters, even if you're happy with the defaults
 So,	`migtool deploy *orgname*`
