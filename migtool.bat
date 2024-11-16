@@ -196,7 +196,7 @@ cmd /c "migtool retrieve %2 %4 transferpackage.zip"
 IF %ERRORLEVEL% EQU 0 (
 	echo calling deploy: migtool deploy %2 transferpackage.zip %5 %6
 	echo: 
-	cmd /c "migtool deploy %2 transferpackage.zip %5 %6"
+	cmd /c "migtool deploy %3 transferpackage.zip %5 %6"
 )
 
 exit /b
