@@ -8,7 +8,8 @@ Usage is as follows:
 
 
 	migtool retrieve propertyfile [packagefile.xml] [outputfilename]
-	migtool deploy propertyfile [directoryname|packagename.zip] [checkonly|d] ["testclass1,testclass2"]
+	migtool deploy propertyfile [directoryname|packagename.zip] [checkonly|d] [testclass1,testclass2]
+	migtool transfer <sourcepropertyfile> <targetpropertyfile> [<packagefile.xml>] [checkonly|d] [testclass1,testclass2]
 
 So fairly straightforward:
 
@@ -48,12 +49,12 @@ Bonus: remember, you can chain commandline commands, so something like this:`mig
 ###### Required installation/path setup:
 * Put some SFDC properties files in a directory. Properties files look like this:
 
-		username=user@password.com
-		password=T0ps3cr3t
-		serverurl=https://login.salesforce.com
-		maxPoll=20000
-		pollWaitMillis=10000
-		apiversion=37.0
+		sf.username=user@password.com
+		sf.password=T0ps3cr3t<securityTokenHereIfNeeded>
+		sf.serverurl=https://login.salesforce.com
+		sf.maxPoll=20000
+		sf.pollWaitMillis=10000
+		sf.apiversion=60.0
 
 	The file name is *orgname*.properties, where *orgname* is what you will plug in to the commandline above as *&lt;propertyfile&gt;*
 * Tell migtool where that directory is: change line 3 of migtool.bat to point to the properties dir
