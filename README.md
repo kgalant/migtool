@@ -40,6 +40,9 @@ Great shoutout to DOS for not having a way of parsing parameters that doesn't ma
 
 Bonus: remember, you can chain commandline commands, so something like this:`migtool retrieve mydevorg &amp; migtool deploy mytestorg` will pick up a package.xml file in your current directory, retrieve it from the *mydevorg* org and deploy it to *mytestorg* all in one fell swoop.
 
+### transfer ###
+
+Basically just does first a retrieve then immediately a deploy using an intermediate package name (that you don't get to specify) and default package handling and validation/testclasses as above.
 
 
 ###### Required dependecies (not in this repo): 
