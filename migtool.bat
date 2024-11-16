@@ -1,9 +1,8 @@
-echo off
+@echo off
 
 SET PROPDIR=c:\dev\properties\
 SET SAXON=c:\dev\tools\saxon9he.jar
 SET DEFPACKAGEFILE=package.zip
-SET METADATAIOBASE=c:\Dev\MetadataIO-M31
 
 set P=%~dp0
 
@@ -16,12 +15,12 @@ rem get the command called
 
 SET ACT=%1
 
-if /I NOT %ACT%==deploy if /I NOT %ACT%==retrieve if /I NOT %ACT%==cmp goto :usage
+if /I NOT %ACT%==deploy if /I NOT %ACT%==retrieve if /I NOT %ACT%==transfer goto :usage
 
 SETLOCAL ENABLEEXTENSIONS 
 SETLOCAL EnableDelayedExpansion
 
-if /I %ACT%==cmp goto :cmp %1 %2 %3 %4
+if /I %ACT%==cmp goto :transfer %1 %2 %3 %4 %5 %6
 
 rem *********************************
 rem Common for both deploy & retrieve
@@ -35,7 +34,8 @@ IF EXIST %2 (
 		SET PROPFILE=%PROPDIR%%2.properties
 	) else (
 		echo Couldn't find property file %2 or locate a %PROPDIR%%2.properties file, aborting...
-		goto done
+		exit /b 1
+		rem goto done
 	)
 )
 
@@ -65,7 +65,8 @@ if NOT "%PROPFILE%" == "" (
 		 			@move /y %%i package.zip
 		 		)
 		 	)
-		 	goto done
+		 	rem goto done
+			exit /b
 	 	)
 	) 
 
@@ -112,90 +113,81 @@ if NOT "%PROPFILE%" == "" (
 				)
 				echo calling: ant -f %P%!BUILDXML! -propertyfile %PROPFILE% !DEPLOYTARGET! !BLDTARGET! !CHECKONLYSTRING!
 			 	cmd /c "ant -f %P%!BUILDXML! -propertyfile %PROPFILE% !DEPLOYTARGET! !BLDTARGET! !CHECKONLYSTRING!"
-			 	goto done
+			 	exit /b
+				rem goto done
 			)
 		)
 	) 
 )
 
+:transfer
+
+rem parameters:
+rem %1:transfer %2:sourcepropertyfile %3:targetpropertyfile %4:packagefile.xml %5:checkonly|d %6:testclass1,testclass2
+
+cls
+echo Asked to transfer %4 from %2 to %3. 
+if "%5" == "checkonly" echo validate only: true
+if NOT "%6" == "" echo test classes to run: %6
+echo: 
+
 rem *********************************
-rem Compare using MetadataIO
+rem Set property file for source
 rem *********************************
 
-:cmp
-
-echo %*
-
-IF NOT "%2" == "" (
-	@rem check if it refers to a valid MetadataIO properties file
-	IF NOT EXIST %METADATAIOBASE%\properties\build.properties.%2 (
-		echo Could not locate %METADATAIOBASE%\properties\build.properties.%2 - aborting
-		goto usage 
+IF EXIST %2 (
+	SET FROMFILE=%2
+) else (
+	IF EXIST %PROPDIR%%2.properties (
+		SET FROMFILE=%PROPDIR%%2.properties
 	) else (
-		echo using %METADATAIOBASE%\properties\build.properties.%2 as comparison source
+		echo Couldn't find property file %2 or locate a %PROPDIR%%2.properties file, aborting...
+		rem goto done
+		exit /b 1
 	)
-) else (
-	echo Could not locate parameter #2 - aborting
-	goto usage
 )
 
-IF NOT "%3"=="" (
-	rem check if it refers to a valid MetadataIO properties file
-	IF NOT EXIST %METADATAIOBASE%\properties\build.properties.%3 (
-		echo Could not locate %METADATAIOBASE%\properties\build.properties.%3 - aborting
-		goto usage
+rem *********************************
+rem Set property file for destination
+rem *********************************
+
+IF EXIST %3 (
+	SET TOFILE=%3
+) else (
+	IF EXIST %PROPDIR%%3.properties (
+		SET TOFILE=%PROPDIR%%3.properties
 	) else (
-		echo using %METADATAIOBASE%\properties\build.properties.%3 as comparison target
+		echo Couldn't find property file %3 or locate a %PROPDIR%%3.properties file, aborting...
+		rem goto done
+		exit /b 1
 	)
-) else (
-	echo Could not locate parameter #3 - aborting
-	goto usage
 )
 
-if "%4"=="" (
-	if EXIST %CD%\package.xml (
-		echo Nothing provided to compare, but found %CD%\package.xml, will use that
-		SET FETCHFILE=%CD%\package.xml
-	)	
-) else if not "%4"=="" (
-	if EXIST "%4" (
-		SET FETCHFILE=%4
-	)
-) else (
-	echo Nothing provided to compare, and %CD%\package.xml not found, aborting
-	goto usage
+rem *********************************
+rem Do the deed
+rem *********************************
+
+echo calling retrieve: migtool retrieve %2 %4 transferpackage.zip
+echo:
+cmd /c "migtool retrieve %2 %4 transferpackage.zip"
+IF %ERRORLEVEL% EQU 0 (
+	echo calling deploy: migtool deploy %2 transferpackage.zip %5 %6
+	echo: 
+	cmd /c "migtool deploy %2 transferpackage.zip %5 %6"
 )
-@echo cleaning %METADATAIOBASE%\repos\org\%2\ 
-rmdir /q /s %METADATAIOBASE%\repos\org\%2\ 
-mkdir %METADATAIOBASE%\repos\org\%2
-@echo copying %FETCHFILE% to %METADATAIOBASE%\repos\org\%2\ 
-copy %FETCHFILE% %METADATAIOBASE%\repos\org\%2 
 
-@echo cleaning %METADATAIOBASE%\repos\org\%3\ 
-rmdir /q /s %METADATAIOBASE%\repos\org\%3\ 
-mkdir %METADATAIOBASE%\repos\org\%3\
-@echo copying %FETCHFILE% to %METADATAIOBASE%\repos\org\%3\ 
-copy %FETCHFILE% %METADATAIOBASE%\repos\org\%3 
-
-
-
-SET CURDIR=%CD%
-cd %METADATAIOBASE%
-echo Fetching content from %2
-cmd /c "multiretrieve %2"
-echo Fetching content from %3
-cmd /c "multiretrieve %3"
-echo Running compare: localDiff.cmd %2 %3 all none
-cmd /c "localDiff.cmd %2 %3 all none"
-cd %CURDIR%
-goto done
-
+exit /b
+rem goto done
 
 :usage
 echo "usage: migtool retrieve <propertyfile> [<packagefile.xml>] [<outputfilename>]"
-echo "usage: migtool deploy <propertyfile> [<directoryname>] [checkonly|d] ["testclass1,testclass2"]" 
-echo "usage: migtool compare <sourcepropertyfile> <targetpropertyfile> [<packagefile.xml>]"
+echo "usage: migtool deploy <propertyfile>/<directoryname> [checkonly|d] ["testclass1,testclass2"]" 
+echo "usage: migtool transfer <sourcepropertyfile> <targetpropertyfile> [<packagefile.xml>] [checkonly|d] ["testclass1,testclass2"]"
+echo "parameters can only be omitted from the end - all parameters up to the last one you want to provide must be provided." 
+echo "E.g. testclass parameter ["testclass1,testclass2"] can be skipped, but if you want to use it, you must provide a [checkonly|d] value"
 :done
+
+exit
 
 ENDLOCAL 
 
