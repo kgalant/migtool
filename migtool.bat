@@ -21,7 +21,7 @@ if /I NOT %ACT%==deploy if /I NOT %ACT%==retrieve if /I NOT %ACT%==transfer goto
 SETLOCAL ENABLEEXTENSIONS 
 SETLOCAL EnableDelayedExpansion
 
-if /I %ACT%==transfer goto :transfer %1 %2 %3 %4 %5 %6
+if /I %ACT%==transfer goto :transfer
 
 rem *********************************
 rem Common for both deploy & retrieve
@@ -71,7 +71,6 @@ if NOT "%PROPFILE%" == "" (
 	) 
 
 	IF /I "%ACT%" == "deploy" (
-
 		if "%3" == "" (
 			if EXIST %DEFPACKAGEFILE% (
 				echo Nothing provided to deploy, but %DEFPACKAGEFILE% found, will deploy that
@@ -112,19 +111,23 @@ if NOT "%PROPFILE%" == "" (
 						echo Asked to find tests in !FETCHFILE!
 						echo:
 						rem Get Package.xml first
-						if "%BLDTARGET%" == "deployDir" (
+						if "!BLDTARGET!" == "deployDir" (
 							rem If deploying a directory, it's simple
-							SET PACKAGEXML = !FETCHFILE!\package.xml
+							SET PACKAGEXML=!FETCHFILE!\package.xml
+							echo package.xml - dir: !PACKAGEXML!
 						) else (
 							rem if deploying a zip, need to unzip, get the package.xml processed, then delete it again
 							mkdir .\migtooltemp
 							cmd /c "%UNZIP% e !FETCHFILE! package.xml -o.\migtooltemp > NUL"
+							SET PACKAGEXML=migtooltemp\package.xml
+							echo package.xml - zip: !PACKAGEXML!
 						)
-
-						FOR /F "tokens=* USEBACKQ" %%F IN (`"java -jar %SAXON% -s:.\migtooltemp\package.xml -xsl:%P%findtests.xsl -warnings:silent"`) DO (
+						FOR /F "tokens=* USEBACKQ" %%F IN (`"java -jar %SAXON% -s:.\!PACKAGEXML! -xsl:%P%findtests.xsl -warnings:silent"`) DO (
 							SET TESTNAMES=%%F
 						)
-						rd /s /q .\migtooltemp
+						if "!BLDTARGET!" == "deployZip" (
+							rd /s /q .\migtooltemp
+						)
 					) else (
 						SET TESTNAMES=%5
 					)
