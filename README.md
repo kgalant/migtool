@@ -8,8 +8,8 @@ Usage is as follows:
 
 
 	migtool retrieve propertyfile [packagefile.xml] [outputfilename]
-	migtool deploy propertyfile [directoryname|packagename.zip] [checkonly|d] [testclass1,testclass2]
-	migtool transfer <sourcepropertyfile> <targetpropertyfile> [<packagefile.xml>] [checkonly|d] [testclass1,testclass2]
+	migtool deploy propertyfile [directoryname|packagename.zip] [checkonly|d] [testclass1,testclass2|findtests]
+	migtool transfer <sourcepropertyfile> <targetpropertyfile> [<packagefile.xml>] [checkonly|d] [testclass1,testclass2|findtests]
 
 So fairly straightforward:
 
